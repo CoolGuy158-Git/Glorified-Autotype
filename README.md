@@ -4,14 +4,13 @@
 
 ## What?
 
-It is a simple first-order Markov language model.
+It is a simple second-order Markov language model.
 
 say you have a dict(the model):
 ```txt
 {
-"cats" ["are", "amazing", "lazy"]
-"dogs" ["are", "big", "strong"]
-"are" ["cute", "big"]
+("cats", "are"): ["cute", "amazing", "lazy"]
+("dogs", "are"): ["big", "strong", "puppies"]
 }
 ```
 and you have this user input:
@@ -19,14 +18,20 @@ and you have this user input:
 "I like cats"
 ```
 
-it takes the word last word it can recognize, in this case its "cats".
+it takes the pair of words it can recognize, in this case
+("like", "cats").
 It then picks a random word from the list.
 let's say it picked "are"
-it then picks another word from the list of the key "are"
+it then takes the second word from the pair and the new word
+and makes a new pair:
+("cats", "are")
+
+it then picks another word from the list of the new pair.
 say it landed on "cute"
 the LM then spits out the completed sentence
 "are cute"
-but since I remove the first word from the final response to make it less like an autotype it turns to
+but since I remove the first word from the final response
+to make it less like an autotype it turns to
 "cute"
 
 ```txt
