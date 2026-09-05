@@ -45,6 +45,7 @@ print("""
 | IT HAS NO MIND.                                                                              |
 ************************************************************************************************
 """)
+start = time.time()
 from nltk.tag import RegexpTagger # It takes time to import so ill just add it under the print warning, this acts like the time.sleep()
 mode = "image"
 with open("model.txt", "r", encoding="utf-8") as model:
@@ -58,6 +59,8 @@ tagger = RegexpTagger([ # Imma try this lib, it's basically a bunch of defined r
     (r"^(want|like|love|need|learn|play|make|get|have|know|think|see|watch|use|build|write|do|does|did)$", "VB"), # Other extra verbs, just in case the rules won't catch these
     (r".*", "NN")
 ])
+end = time.time()
+print(f"Time took to boot: {end - start}secs\n")
 while True:
     og_user_input = input("\n> ").strip(string.punctuation)
     user_input = " ".join(og_user_input.split()[::-1])
@@ -96,20 +99,32 @@ while True:
         continue
     first = True
     print("*Analyzation*---------------------------------")
-    print(f"Pair that rings a bell: {last_word}")
+    print(f"Pair that rings a bell (main pair): {last_word}")
     final_output = []
+    previous_pairs = []
     for i in range(50): # Max response is 50 chars
         while last_word not in model_list: # If it chooses a word that's not on the list
             last_word = random.choice(list(model_list.keys())) # Try picking a new one
 
-        next_words = model_list[last_word]
-        # print(f"Known next words: {next_words}, last word: {last_word}")
-        current_word = random.choice(next_words)
+        next_words = model_list[last_word].copy()
+        scores = {word: next_words.count(word) for word in set(next_words)}
+
+        for distance, pair in enumerate(reversed(previous_pairs[:-1]), 1): # New update! Get context pairs.
+            print(f"Pair #{distance}: {pair}")
+            if pair in model_list: # Basically gives bias to the words that overlap with the context pairs and main pair
+                amount = 1 / (2 ** distance)
+
+                for word in scores:
+                    scores[word] += model_list[pair].count(word) * amount
+        print(f"Known next words: {next_words}, last word: {last_word}")
+        previous_pairs.append(last_word)
+        current_word = random.choices(list(scores.keys()),weights=list(scores.values()))[0]
         print(f"Picked word: {current_word}")
         if current_word.endswith((".", "!", "?")): # If sentence ends then just end response
             final_output.append(current_word)
             print("-END-")
             break
+
 
         if not first: # Basically this is an attempt to make it less like its just completing what you're saying, but more like actually responding to your input
             final_output.append(current_word)
@@ -124,7 +139,6 @@ while True:
     print("\n----------------------------------------------")
     print(f"Prompt: {og_user_input}")
     print("AI Response:")
-    print(f"    {' '.join(final_output)}.")
+    print(f"    {' '.join(final_output)}")
     print("\n----------------------------------------------")
-
 

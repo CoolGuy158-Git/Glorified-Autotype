@@ -33,6 +33,7 @@ if train_file == "":
     train_file = "training_data.txt"
 start = time.time()
 word_list = {}
+total_transitions = 0
 for words in open(train_file, encoding="utf-8"):
     words = words.split()
     for i in range(len(words) - 2):
@@ -41,12 +42,22 @@ for words in open(train_file, encoding="utf-8"):
         next_next_word = words[i + 2].lower()
         couple = (current, next_word) # Wow it's a couple.
         word_list.setdefault(couple, []).append(next_next_word)
+        total_transitions += 1
 
 file = open("model.txt", "w", encoding="utf-8")
 file.write(str(word_list))
 end = time.time()
 elapsed = end - start
 print("Training complete!")
+print("--*Training info*--")
 print(f"{len(word_list)} pairs in total.")
-print(f"Time: {elapsed} seconds.")
+print(f"{total_transitions} transitions.")
+print(f"{total_transitions / len(word_list)} avg transitions per pair.")
+print("-------------------")
+print("\n--*Time info*--")
+print(f"{elapsed / total_transitions:.6f} seconds per transition.")
+print(f"{elapsed} seconds to train.")
+print("---------------")
+print("\n--*File info*--")
 print(f"Size: {os.path.getsize("model.txt")/ 1024:.2f} KB")
+print("---------------")
