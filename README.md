@@ -83,4 +83,6 @@ I went searching a little and found that it was something called 'Markov LM', an
 
 - The training_data.txt is just a sample training data, I recommend at least a 600 line, conversational, or essay like training data for this to work well.
 
-- Before trying to run main.py, run train.py first to generate the model, only then can main.py work.
+- Before trying to run main.py, run model_gen.py first to generate the model, only then can main.py work.
+
+- Optional: Run train/train.py to (kinda) improve the model via a [Reinforcement Learning](https://en.wikipedia.org/wiki/Reinforcement_learning) inspired, weights optimization. (Wow I made up a name!)
